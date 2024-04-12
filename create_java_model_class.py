@@ -212,20 +212,21 @@ def create_class(class_name, base_directory, package_name, type_name):
 
 
 def main():
-    if len(sys.argv) != 3:
-        print("Usage: python create_java_structure.py ClassName PackageName")
+    if len(sys.argv) != 4:
+        print("Usage: python create_java_structure.py ModuleName ClassName PackageName")
         sys.exit(1)
 
-    class_name = sys.argv[1]
-    package_name = sys.argv[2]
-    base_directory = "src/main/java/com/example/"  # Assuming standard Maven project structure
+    module_name = sys.argv[1]
+    class_name = sys.argv[2]
+    package_name = sys.argv[3]
+    # The base directory now includes the module name dynamically
+    base_directory = f"../{module_name}/src/main/java/com/example/"
 
     # Create each component
     for type_name in templates.keys():
         create_class(class_name, base_directory, package_name, type_name)
 
     # Any additional operations or function calls go here
-
 
 if __name__ == "__main__":
     main()
