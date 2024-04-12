@@ -167,6 +167,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.{package}.dto.{ClassName}Dto;
 import com.example.{package}.service.{ClassName}Service;
 import com.example.backendcoreservice.controller.AbstractController;
+import com.example.backendcoreservice.api.ApiResponseBuilder;
 
 
 @RestController
@@ -175,11 +176,17 @@ import com.example.backendcoreservice.controller.AbstractController;
 public class {ClassName}Controller implements AbstractController<{ClassName}Service, {ClassName}Dto> {{
 
     private final {ClassName}Service {className}Service;
+    private final ApiResponseBuilder<{ClassName}Dto> apiResponseBuilder;
 
 
     @Override
     public {ClassName}Service getService() {{
         return {className}Service;
+    }}
+    
+    @Override
+    public ApiResponseBuilder<{ClassName}Dto> getApiResponseBuilder() {{
+    return apiResponseBuilder;
     }}
 
 
