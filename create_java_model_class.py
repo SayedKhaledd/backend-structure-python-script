@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 
 
@@ -11,8 +12,9 @@ def write_file(directory, file_name, content):
 
 
 # Function to generate class contents for various components
-def generate_class_content(package_name, class_name, template):
-    return template.format(package=package_name, ClassName=class_name, className=class_name.lower())
+def generate_class_content(package_name, class_name, table_name, template):
+    return template.format(package=package_name, ClassName=class_name, className=class_name.lower(),
+                           TableName=table_name)
 
 
 # Function to get the directory for a given type
@@ -24,17 +26,40 @@ def get_directory(base_directory, type_path):
 templates = {
     "model": """package com.example.{package}.model;
 import com.example.backendcoreservice.model.AbstractEntity;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Entity
+@Table(name = "{TableName}")
 public class {ClassName} extends AbstractEntity {{
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "{TableName}_id_sequence")
+    @SequenceGenerator(name = "{TableName}_id_sequence", sequenceName = "{TableName}_id_sequence", allocationSize = 1)
+    private Long id;
 
 }}
 """,
     "dto": """package com.example.{package}.dto;
 import com.example.backendcoreservice.dto.AbstractDto;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class {ClassName}Dto extends AbstractDto {{
-
+private Long id;
 
 }}
 """,
@@ -93,7 +118,7 @@ import com.example.backendcoreservice.dao.AbstractDao;
 import com.example.{package}.dao.repo.{ClassName}Repo;
 
 public interface {ClassName}Dao extends AbstractDao<{ClassName}, {ClassName}Repo> {{
-    // Define additional DAO methods here
+
 }}
 """,
     "dao.impl": """package com.example.{package}.dao;
@@ -198,7 +223,12 @@ public class {ClassName}Controller implements AbstractController<{ClassName}Serv
 }
 
 
-def create_class(class_name, base_directory, package_name, type_name):
+def camel_to_snake(name):
+    name = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', name).lower()
+
+
+def create_class(class_name, table_name, base_directory, package_name, type_name):
     # Special handling for 'dao.impl' to avoid creating an 'impl' package
     if type_name == "dao.impl":
         directory = get_directory(base_directory, f"{package_name}.dao")
@@ -214,7 +244,7 @@ def create_class(class_name, base_directory, package_name, type_name):
         directory = get_directory(base_directory, f"{package_name}.{type_name}")
         file_name = f"{class_name}{type_name.split('/')[-1].capitalize()}.java"
 
-    content = generate_class_content(package_name, class_name, templates[type_name])
+    content = generate_class_content(package_name, class_name, table_name, templates[type_name])
     write_file(directory, file_name, content)
 
 
@@ -231,9 +261,11 @@ def main():
 
     # Create each component
     for type_name in templates.keys():
-        create_class(class_name, base_directory, package_name, type_name)
+        table_name = camel_to_snake(class_name)
+        create_class(class_name, table_name, base_directory, package_name, type_name)
 
     # Any additional operations or function calls go here
+
 
 if __name__ == "__main__":
     main()
