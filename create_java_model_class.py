@@ -12,9 +12,9 @@ def write_file(directory, file_name, content):
 
 
 # Function to generate class contents for various components
-def generate_class_content(package_name, class_name, table_name, template):
+def generate_class_content(package_name, class_name, table_name, template, artifact_id):
     return template.format(package=package_name, ClassName=class_name, className=class_name.lower(),
-                           TableName=table_name)
+                           TableName=table_name, artifactId=artifact_id)
 
 
 # Function to get the directory for a given type
@@ -24,8 +24,8 @@ def get_directory(base_directory, type_path):
 
 # Templates for different class types
 templates = {
-    "model": """package com.example.{package}.model;
-import com.example.backendcoreservice.model.AbstractEntity;
+    "model": """package {artifactId}.{package}.model;
+import {artifactId}.backendcoreservice.model.AbstractEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -47,8 +47,8 @@ public class {ClassName} extends AbstractEntity {{
 
 }}
 """,
-    "dto": """package com.example.{package}.dto;
-import com.example.backendcoreservice.dto.AbstractDto;
+    "dto": """package {artifactId}.{package}.dto;
+import {artifactId}.backendcoreservice.dto.AbstractDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -63,13 +63,13 @@ private Long id;
 
 }}
 """,
-    "transformer/mapper": """package com.example.{package}.transformer.mapper;
+    "transformer/mapper": """package {artifactId}.{package}.transformer.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.InjectionStrategy;
-import com.example.{package}.dto.{ClassName}Dto;
-import com.example.{package}.model.{ClassName};
-import com.example.backendcoreservice.transformer.mapper.AbstractMapper;
+import {artifactId}.{package}.dto.{ClassName}Dto;
+import {artifactId}.{package}.model.{ClassName};
+import {artifactId}.backendcoreservice.transformer.mapper.AbstractMapper;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface {ClassName}Mapper extends AbstractMapper<{ClassName}, {ClassName}Dto> {{
@@ -77,14 +77,14 @@ public interface {ClassName}Mapper extends AbstractMapper<{ClassName}, {ClassNam
 
 }}
 """,
-    "transformer": """package com.example.{package}.transformer;
+    "transformer": """package {artifactId}.{package}.transformer;
 
 import org.springframework.stereotype.Component;
 import lombok.AllArgsConstructor;
-import com.example.{package}.transformer.mapper.{ClassName}Mapper;
-import com.example.{package}.dto.{ClassName}Dto;
-import com.example.{package}.model.{ClassName};
-import com.example.backendcoreservice.transformer.AbstractTransformer;
+import {artifactId}.{package}.transformer.mapper.{ClassName}Mapper;
+import {artifactId}.{package}.dto.{ClassName}Dto;
+import {artifactId}.{package}.model.{ClassName};
+import {artifactId}.backendcoreservice.transformer.AbstractTransformer;
 
 @Component
 @AllArgsConstructor
@@ -100,32 +100,32 @@ public class {ClassName}Transformer implements AbstractTransformer<{ClassName}, 
 
 }}
 """,
-    "dao/repo": """package com.example.{package}.dao.repo;
+    "dao/repo": """package {artifactId}.{package}.dao.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import com.example.{package}.model.{ClassName};
+import {artifactId}.{package}.model.{ClassName};
 
 @Repository
 public interface {ClassName}Repo extends JpaRepository<{ClassName}, Long> {{
 
 }}
 """,
-    "dao": """package com.example.{package}.dao;
+    "dao": """package {artifactId}.{package}.dao;
 
-import com.example.{package}.model.{ClassName};
-import com.example.backendcoreservice.dao.AbstractDao;
-import com.example.{package}.dao.repo.{ClassName}Repo;
+import {artifactId}.{package}.model.{ClassName};
+import {artifactId}.backendcoreservice.dao.AbstractDao;
+import {artifactId}.{package}.dao.repo.{ClassName}Repo;
 
 public interface {ClassName}Dao extends AbstractDao<{ClassName}, {ClassName}Repo> {{
 
 }}
 """,
-    "dao.impl": """package com.example.{package}.dao;
+    "dao.impl": """package {artifactId}.{package}.dao;
 
 import org.springframework.stereotype.Component;
 import lombok.AllArgsConstructor;
-import com.example.{package}.dao.repo.{ClassName}Repo;
+import {artifactId}.{package}.dao.repo.{ClassName}Repo;
 
 @Component
 @AllArgsConstructor
@@ -141,25 +141,25 @@ public class {ClassName}DaoImpl implements {ClassName}Dao {{
 
 }}
 """,
-    "service": """package com.example.{package}.service;
+    "service": """package {artifactId}.{package}.service;
 
-import com.example.{package}.model.{ClassName};
-import com.example.{package}.dto.{ClassName}Dto;
-import com.example.{package}.transformer.{ClassName}Transformer;
-import com.example.{package}.dao.{ClassName}Dao;
-import com.example.backendcoreservice.service.AbstractService;
+import {artifactId}.{package}.model.{ClassName};
+import {artifactId}.{package}.dto.{ClassName}Dto;
+import {artifactId}.{package}.transformer.{ClassName}Transformer;
+import {artifactId}.{package}.dao.{ClassName}Dao;
+import {artifactId}.backendcoreservice.service.AbstractService;
 
 public interface {ClassName}Service extends AbstractService<{ClassName}, {ClassName}Dto, {ClassName}Transformer, {ClassName}Dao> {{
 
 }}
 """,
-    "service.impl": """package com.example.{package}.service;
+    "service.impl": """package {artifactId}.{package}.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import com.example.{package}.dao.{ClassName}Dao;
-import com.example.{package}.transformer.{ClassName}Transformer;
+import {artifactId}.{package}.dao.{ClassName}Dao;
+import {artifactId}.{package}.transformer.{ClassName}Transformer;
 
 @Slf4j
 @Service
@@ -184,15 +184,15 @@ public class {ClassName}ServiceImpl implements {ClassName}Service {{
 
 }}
 """,
-    "controller": """package com.example.{package}.controller;
+    "controller": """package {artifactId}.{package}.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.example.{package}.dto.{ClassName}Dto;
-import com.example.{package}.service.{ClassName}Service;
-import com.example.backendcoreservice.controller.AbstractController;
-import com.example.backendcoreservice.api.ApiResponseBuilder;
+import {artifactId}.{package}.dto.{ClassName}Dto;
+import {artifactId}.{package}.service.{ClassName}Service;
+import {artifactId}.backendcoreservice.controller.AbstractController;
+import {artifactId}.backendcoreservice.api.ApiResponseBuilder;
 
 
 @RestController
@@ -228,7 +228,7 @@ def camel_to_snake(name):
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', name).lower()
 
 
-def create_class(class_name, table_name, base_directory, package_name, type_name):
+def create_class(class_name, table_name, base_directory, package_name, type_name, artifact_id):
     # Special handling for 'dao.impl' to avoid creating an 'impl' package
     if type_name == "dao.impl":
         directory = get_directory(base_directory, f"{package_name}.dao")
@@ -244,25 +244,34 @@ def create_class(class_name, table_name, base_directory, package_name, type_name
         directory = get_directory(base_directory, f"{package_name}.{type_name}")
         file_name = f"{class_name}{type_name.split('/')[-1].capitalize()}.java"
 
-    content = generate_class_content(package_name, class_name, table_name, templates[type_name])
+    content = generate_class_content(package_name, class_name, table_name, templates[type_name], artifact_id)
     write_file(directory, file_name, content)
 
 
 def main():
-    if len(sys.argv) != 4:
+    print(len(sys.argv))
+    if len(sys.argv) != 4 and len(sys.argv) != 5:
         print("Usage: python create_java_structure.py ModuleName ClassName PackageName")
         sys.exit(1)
 
     module_name = sys.argv[1]
     class_name = sys.argv[2]
     package_name = sys.argv[3]
+    # add optional parameter for artifactId
+    if len(sys.argv) == 5:
+        artifact_id = sys.argv[4]
+    else:
+        artifact_id = "com.example"
+
     # The base directory now includes the module name dynamically
-    base_directory = f"../{module_name}/src/main/java/com/example/"
+    first_part_of_artifact_id = artifact_id.split('.')[0]
+    second_part_of_artifact_id = artifact_id.split('.')[1]
+    base_directory = f"../{module_name}/src/main/java/{first_part_of_artifact_id}/{second_part_of_artifact_id}/"
 
     # Create each component
     for type_name in templates.keys():
         table_name = camel_to_snake(class_name)
-        create_class(class_name, table_name, base_directory, package_name, type_name)
+        create_class(class_name, table_name, base_directory, package_name, type_name, artifact_id)
 
     # Any additional operations or function calls go here
 
