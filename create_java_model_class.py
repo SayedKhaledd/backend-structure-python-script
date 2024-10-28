@@ -179,6 +179,11 @@ public class {ClassName}ServiceImpl implements {ClassName}Service {{
         return {className}Transformer;
     }}
     
+    @Override
+    public String getEntityName() {{
+       return {className}.class.getSimpleName();
+    }}
+    
 
 
 
