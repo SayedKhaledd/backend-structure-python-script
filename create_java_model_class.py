@@ -57,6 +57,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder(toBuilder = true, builderMethodName = "{ClassName}DtoBuilder")
 @Data
 public class {ClassName}Dto extends AbstractDto {{
 private Long id;
@@ -160,6 +161,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import {artifactId}.{package}.dao.{ClassName}Dao;
 import {artifactId}.{package}.transformer.{ClassName}Transformer;
+import {artifactId}.{package}.model.{ClassName};
+
 
 @Slf4j
 @Service
@@ -181,7 +184,7 @@ public class {ClassName}ServiceImpl implements {ClassName}Service {{
     
     @Override
     public String getEntityName() {{
-       return {className}.class.getSimpleName();
+       return {ClassName}.class.getSimpleName();
     }}
     
 
